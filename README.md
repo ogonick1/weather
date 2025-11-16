@@ -75,7 +75,7 @@ Vite
 
  Встановлення та запуск
 1. Клонувати репозиторій
-git clone https://github.com/yourname/weather-app.git
+git clone https://github.com/ogonick1/weather.git
 cd weather-app
 
 2. Встановити залежності
