@@ -1,5 +1,5 @@
-import React from "react";
-import type { WeatherResponse } from "../api/weather";
+import React, { useMemo } from "react";
+import type { WeatherResponse } from "../types/weather";
 
 type Props = {
   data: WeatherResponse;
@@ -48,7 +48,11 @@ function getWeatherTheme(main: string) {
 
 export const WeatherCard: React.FC<Props> = ({ data }) => {
   const mainWeather = data.weather[0];
-  const theme = getWeatherTheme(mainWeather.main);
+
+  const theme = useMemo(
+    () => getWeatherTheme(mainWeather.main),
+    [mainWeather.main]
+  );
 
   return (
     <div
@@ -88,11 +92,15 @@ export const WeatherCard: React.FC<Props> = ({ data }) => {
         </div>
         <div className="bg-slate-900/30 rounded-xl px-3 py-2">
           <div className="text-slate-100/80">Вітер</div>
-          <div className="font-semibold">{Math.round(data.wind.speed)} м/с</div>
+          <div className="font-semibold">
+            {Math.round(data.wind.speed)} м/с
+          </div>
         </div>
         <div className="bg-slate-900/30 rounded-xl px-3 py-2">
           <div className="text-slate-100/80">Відчувається</div>
-          <div className="font-semibold">~{Math.round(data.main.temp)}°C</div>
+          <div className="font-semibold">
+            ~{Math.round(data.main.feels_like)}°C
+          </div>
         </div>
       </div>
     </div>

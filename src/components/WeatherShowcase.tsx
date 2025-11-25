@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { WeatherCard } from "./WeatherCard";
-import type { WeatherResponse } from "../api/weather";
+import type { WeatherResponse } from "../types/weather";
 
 const mockWeathers: WeatherResponse[] = [
   {
     name: "Sun",
-    main: { temp: 25, humidity: 40 },
+    main: { temp: 25, feels_like: 26, humidity: 40 },
     weather: [
       {
         id: 800,
@@ -18,7 +18,7 @@ const mockWeathers: WeatherResponse[] = [
   },
   {
     name: "Rain",
-    main: { temp: 12, humidity: 85 },
+    main: { temp: 12, feels_like: 10, humidity: 85 },
     weather: [
       {
         id: 500,
@@ -31,7 +31,7 @@ const mockWeathers: WeatherResponse[] = [
   },
   {
     name: "Snow",
-    main: { temp: -3, humidity: 90 },
+    main: { temp: -3, feels_like: -7, humidity: 90 },
     weather: [
       {
         id: 600,
@@ -44,7 +44,7 @@ const mockWeathers: WeatherResponse[] = [
   },
   {
     name: "Clouds",
-    main: { temp: 5, humidity: 67 },
+    main: { temp: 5, feels_like: 3, humidity: 67 },
     weather: [
       {
         id: 804,
@@ -63,7 +63,7 @@ export const WeatherShowcase: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setStep((prev) => prev + 1);
-    }, 5000); // кожні 5 секунд
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);

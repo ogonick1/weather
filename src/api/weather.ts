@@ -4,29 +4,30 @@ import {
   isCityTemporarilyBlocked,
   markCityNotFound,
 } from "../utils/WeatherCache";
+import type { WeatherResponse } from "../types/weather";
 
-const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
-
-export type WeatherResponse = {
-  name: string;
-  main: {
-    temp: number;
-    humidity: number;
-  };
-  weather: { main: string; description: string; icon: string, id?: number }[];
-  wind: {
-    speed: number;
-  };
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+const getApiKey = (): string => {
+  const key = import.meta.env.VITE_WEATHER_API_KEY;
+  if (!key) {
+    throw new Error("API key is missing");
+  }
+  return key;
 };
 
-export async function fetchWeatherByCity(city: string): Promise<WeatherResponse> {
+export async function fetchWeatherByCity(
+  city: string,
+  signal?: AbortSignal
+): Promise<WeatherResponse> {
   const trimmedCity = city.trim();
   if (!trimmedCity) {
     throw new Error("Введіть назву міста");
   }
 
   if (isCityTemporarilyBlocked(trimmedCity)) {
-    throw new Error("Це місто раніше не було знайдено. Змініть назву перед новим запитом.");
+    throw new Error(
+      "Це місто раніше не було знайдено. Змініть назву перед новим запитом."
+    );
   }
 
   const cached = getCachedWeather<WeatherResponse>(trimmedCity);
@@ -34,16 +35,13 @@ export async function fetchWeatherByCity(city: string): Promise<WeatherResponse>
     return cached;
   }
 
-const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
-  if (!apiKey) {
-    throw new Error("API key is missing");
-  }
+  const apiKey = getApiKey();
 
   const url = `${BASE_URL}?q=${encodeURIComponent(
     trimmedCity
   )}&appid=${apiKey}&units=metric&lang=ua`;
 
-  const res = await fetch(url);
+  const res = await fetch(url, { signal });
 
   if (!res.ok) {
     if (res.status === 404) {
@@ -61,12 +59,10 @@ const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
 
 export async function fetchWeatherByCoords(
   lat: number,
-  lon: number
+  lon: number,
+  signal?: AbortSignal
 ): Promise<WeatherResponse> {
-const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
-  if (!apiKey) {
-    throw new Error("API key is missing");
-  }
+  const apiKey = getApiKey();
 
   const cacheKey = `${lat.toFixed(3)},${lon.toFixed(3)}`;
   const cached = getCachedWeather<WeatherResponse>(cacheKey);
@@ -75,7 +71,7 @@ const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
   }
 
   const url = `${BASE_URL}?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=ua`;
-  const res = await fetch(url);
+  const res = await fetch(url, { signal });
 
   if (!res.ok) {
     throw new Error("Не вдалося отримати погоду за геолокацією");
